@@ -25,3 +25,6 @@ Thumbs.db
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+# ignore file folder
+documents/

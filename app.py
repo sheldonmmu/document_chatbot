@@ -24,13 +24,13 @@ st.markdown("""
         padding: 0.5rem;
     }
     .user-message {
-        background-color: #e6f7ff;
+        background-color: #00000;
         padding: 1rem;
         border-radius: 0.5rem;
         margin-bottom: 1rem;
     }
     .bot-message {
-        background-color: #f0f0f0;
+        background-color: #000000;
         padding: 1rem;
         border-radius: 0.5rem;
         margin-bottom: 1rem;
@@ -41,6 +41,7 @@ st.markdown("""
         border-radius: 0.5rem;
         margin-bottom: 1rem;
         border-left: 3px solid #4CAF50;
+        color: black;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -66,7 +67,7 @@ with st.sidebar:
         "This app uses Claude AI to answer questions about your documents. "
         "It supports PDFs, Word documents, text files, and images with text."
     )
-    
+
     st.header("Instructions")
     st.markdown(
         "1. Place document files in the 'documents' folder\n"
@@ -74,21 +75,24 @@ with st.sidebar:
         "3. Start this app with 'streamlit run app.py'\n"
         "4. Ask questions about your documents"
     )
-    
+
     # Document stats
     st.header("Document Information")
     db_folder = "db"
-    
+
     # Show document stats if available
     if os.path.exists(db_folder):
         try:
             # Count documents in the database
-            collection_size = sum(len(files) for _, _, files in os.walk(db_folder))
-            st.markdown(f"<div class='document-info'>Vector database is ready with document information.</div>", unsafe_allow_html=True)
+            collection_size = sum(len(files)
+                                  for _, _, files in os.walk(db_folder))
+            st.markdown(
+                f"<div class='document-info'>Vector database is ready with document information.</div>", unsafe_allow_html=True)
         except Exception as e:
             st.warning(f"Could not read database stats: {e}")
     else:
-        st.warning("No vector database found. Please process your documents first.")
+        st.warning(
+            "No vector database found. Please process your documents first.")
 
 # Load the vector database
 db_folder = "db"
@@ -106,9 +110,11 @@ qa_chain = create_chatbot(vectordb)
 for message in st.session_state.messages:
     with st.container():
         if message["role"] == "user":
-            st.markdown(f"<div class='user-message'>🧑‍💻 You: {message['content']}</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='user-message'>🧑‍💻 You: {message['content']}</div>", unsafe_allow_html=True)
         else:
-            st.markdown(f"<div class='bot-message'>🤖 Bot: {message['content']}</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='bot-message'>🤖 Bot: {message['content']}</div>", unsafe_allow_html=True)
 
 # Chat input
 prompt = st.text_area("Ask a question about your documents:", height=100)
@@ -117,23 +123,26 @@ if st.button("Send"):
     if prompt:
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
-        
+
         # Display user message
         with st.container():
-            st.markdown(f"<div class='user-message'>🧑‍💻 You: {prompt}</div>", unsafe_allow_html=True)
-        
+            st.markdown(
+                f"<div class='user-message'>🧑‍💻 You: {prompt}</div>", unsafe_allow_html=True)
+
         # Get response from chatbot
         with st.spinner("Thinking..."):
             response = qa_chain.invoke({"question": prompt})
             answer = response["answer"]
-        
+
         # Add bot message to chat history
-        st.session_state.messages.append({"role": "assistant", "content": answer})
-        
+        st.session_state.messages.append(
+            {"role": "assistant", "content": answer})
+
         # Display bot message
         with st.container():
-            st.markdown(f"<div class='bot-message'>🤖 Bot: {answer}</div>", unsafe_allow_html=True)
-        
+            st.markdown(
+                f"<div class='bot-message'>🤖 Bot: {answer}</div>", unsafe_allow_html=True)
+
         # Clear input
         prompt = ""
         st.experimental_rerun()
